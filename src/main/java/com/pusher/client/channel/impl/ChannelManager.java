@@ -356,7 +356,16 @@ public class ChannelManager implements ConnectionEventListener {
                 try {
                     AuthResponseData responseData = authHttpRequest(socketId, list);
                     Map<String, PusherAuthResponse> response = responseData.getResponse();
-                    String responseForChannel = GSON.toJson(response.get(channelName));
+                    final PusherAuthResponse authResponse = response.get(channelName);
+
+                    if (authResponse.auth == null) {
+                        System.out
+                                .println(channelName + authResponse.reason);
+                        emitter.onError(new AuthorizationFailureException(
+                                new AuthorizationMissingException(authResponse.reason)));
+                    }
+
+                    String responseForChannel = GSON.toJson(authResponse);
                     if (responseForChannel != null && !responseForChannel.isEmpty()) {
                         InternalChannel queuedChannel = channelNameToChannelMap.get(channelName);
                         if (queuedChannel == null) {
