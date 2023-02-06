@@ -325,6 +325,11 @@ public class ChannelManager implements ConnectionEventListener {
 
     private boolean isCritical(String channelName) {
         if (channelName == null) return false;
+        // workaround
+        // presence-enc-message和presence-enc-asset先不要當成critical
+        if (channelName.startsWith("presence-enc-message") || channelName.startsWith("presence-enc-asset")) {
+            return false;
+        }
         boolean b = false;
         for (String s: getCriticalChannelPrefixList()) {
             if (channelName.startsWith(s)) {
